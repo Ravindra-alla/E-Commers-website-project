@@ -1,10 +1,22 @@
 services:
+  # Python backend web service
   - type: web
-    name: ecommerce-web
+    name: ecommerce-backend
     env: python
     plan: free
+    branch: main        # change if your default branch is different
     buildCommand: pip install -r backend/requirements.txt
     startCommand: cd backend && gunicorn app:app --bind 0.0.0.0:$PORT
+    autoDeploy: true
+
+  # Static frontend: will serve files from the `frontend` folder
+  - type: static
+    name: ecommerce-frontend
+    env: static
+    plan: free
+    branch: main        # same as above
+    buildCommand: ""  # no build step for plain HTML/JS/CSS
+    staticPublishPath: frontend
     autoDeploy: true
 
 
