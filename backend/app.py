@@ -1,16 +1,21 @@
 """
 E-Commerce Backend API
-Simple Flask server providing product data
+Simple Flask server providing product and serving frontend for deployment.
 """
 
-from flask import Flask, jsonify
+import os
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 
 # Initialize Flask app
 app = Flask(__name__)
 
-# Enable CORS to allow frontend to access the API
+# Enable CORS to allow frontend or other clients to access the API
 CORS(app)
+
+# Paths for serving the frontend through Flask (useful for Render deployment)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_FOLDER = os.path.join(BASE_DIR, "..", "frontend")
 
 # Dummy products data stored as a Python list
 # Each product contains: id, name, price (in INR), and image URL
@@ -184,12 +189,29 @@ def get_products():
     return jsonify(products)
 
 
-@app.route('/', methods=['GET'])
-def home():
+@app.route("/health", methods=["GET"])
+def health():
     """
-    Root endpoint - simple health check
+    Simple health check endpoint for monitoring.
     """
-    return jsonify({"message": "E-Commerce API is running!", "status": "success"})
+    return jsonify({"message": "E-Commerce API is healthy!", "status": "success"})
+
+
+@app.route("/", methods=["GET"])
+def serve_index():
+    """
+    Serve the main frontend application (index.html).
+    This allows a single Render service to host both API and UI.
+    """
+    return send_from_directory(FRONTEND_FOLDER, "index.html")
+
+
+@app.route("/<path:path>", methods=["GET"])
+def serve_static(path):
+    """
+    Serve static assets (CSS, JS, images) for the frontend.
+    """
+    return send_from_directory(FRONTEND_FOLDER, path)
 
 
 if __name__ == '__main__':

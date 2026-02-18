@@ -9,7 +9,10 @@ let cart = [];
 let totalRevenue = 0;
 
 // API endpoint
-const API_URL = 'http://localhost:5000/api/products';
+// In production (Render), this will be served by the same Flask app,
+// so we can use a relative path. For local development, also access
+// the frontend through Flask at http://localhost:5000/
+const API_URL = '/api/products';
 
 /**
  * Initialize the application when DOM is loaded
@@ -49,7 +52,7 @@ async function fetchProducts() {
         updateTotalProducts();
     } catch (error) {
         console.error('Error fetching products:', error);
-        displayError('Failed to load products. Make sure the backend server is running on http://localhost:5000');
+        displayError('Failed to load products. Please try again in a moment.');
     }
 }
 
